@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <!-- התאמה מלאה למסכי טלפון -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מעקב השקעות - שיטת היחידות</title>
+  <style>
+    /* עיצוב בסיסי */
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+      color: #333;
+    }
+    /* קונטיינר מלא רוחב */
+    .container {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    h1, h2 {
+      text-align: center;
+      margin-top: 20px;
+    }
+    /* עיצוב לכל חלק – כל חלק יתפוס 100% מרוחב המסך */
+    form, #summary, #marketUpdate, #historyManager {
+      background-color: #fff;
+      padding: 15px;
+      margin: 15px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input[type="number"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 150px;
+      font-family: monospace;
+    }
+    /* קונטיינר לטבלה עם גלילה */
+    .table-container {
+      width: 100%;
+      max-height: 300px; /* <-- כאן ניתן לשנות את הגובה המקסימלי של אזור הטבלה */
+      overflow-y: auto;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-sizing: border-box;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+    /* התאמה למסכים קטנים מאוד */
+    @media (max-width: 400px) {
+      button, input, textarea {
+        font-size: 14px;
+      }
+      th, td {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>מעקב השקעות - שיטת היחידות</h1>
+
+  <!-- סיכום נוכחי -->
+  <div id="summary">
+    <p><strong>שווי החשבון (S):</strong> <span id="accountValue">120177.00</span> ש״ח</p>
+    <p><strong>מספר יחידות (U):</strong> <span id="totalUnits">120177.00</span></p>
+    <p><strong>מחיר ליחידה (P):</strong> <span id="pricePerUnit">1.0000</span> ש״ח</p>
+    <p><strong>האחוז שלך:</strong> <span id="yourShare">100.00%</span></p>
+    <p><strong>האחוז של איה:</strong> <span id="partnerShare">0.00%</span></p>
+  </div>
+
+  <!-- עדכון שווי שוק (במקרה של תנודות בשוק) -->
+  <div id="marketUpdate">
+    <label for="marketValue">עדכן שווי שוק נוכחי (S):</label>
+    <input type="number" id="marketValue" step="0.01" placeholder="למשל, 200000">
+    <button id="updateMarketBtn">עדכן שווי שוק</button>
+  </div>
+
+  <!-- טופס להזנת הפקדות -->
+  <h2>הוסף הפקדה</h2>
+  <form id="depositForm">
+    <!-- התאריך יחושב אוטומטית, אין צורך להזינו ידנית -->
+    <label for="yourDeposit">הפקדה שלך (ש״ח):</label>
+    <input type="number" id="yourDeposit" step="0.01" value="5000" required>
+
+    <label for="partnerDeposit">הפקדה של איה (ש״ח):</label>
+    <input type="number" id="partnerDeposit" step="0.01" value="1000" required>
+
+    <button type="submit">הוסף הפקדה</button>
+  </form>
+
+  <!-- טבלה המציגה את כל הנתונים -->
+  <h2>היסטוריית הפקדות</h2>
+  <div class="table-container">
+    <table id="historyTable">
+      <thead>
+      <tr>
+        <th>מס'</th>
+        <th>תאריך</th>
+        <th>הפקדה שלך (ש״ח)</th>
+        <th>הפקדה של איה (ש״ח)</th>
+        <th>יחידות חדשות שלך</th>
+        <th>יחידות חדשות של איה</th>
+        <th>מחיר ליחידה (לפני הפקדה)</th>
+        <th>שווי חשבון (S)</th>
+        <th>מספר יחידות (U)</th>
+        <th>האחוז שלך</th>
+        <th>האחוז של איה</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- שורות ההיסטוריה יתמלאו כאן באופן דינמי -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ניהול היסטוריה ידני -->
+  <h2>ניהול היסטוריה ידני</h2>
+  <div id="historyManager">
+    <textarea id="historyEditor" placeholder="כאן תופיע ההיסטוריה (בפורמט JSON)"></textarea>
+    <button id="updateHistoryBtn">עדכן היסטוריה</button>
+    <button id="clearHistoryBtn">נקה היסטוריה</button>
+  </div>
+</div>
+
+<script>
+  /********* משתנים ראשוניים **********/
+  const INITIAL_ACCOUNT_VALUE = 120177.0;
+  const INITIAL_TOTAL_UNITS = 120177.0;
+
+  let accountValue = INITIAL_ACCOUNT_VALUE;
+  let totalUnits = INITIAL_TOTAL_UNITS;
+  let yourCumulativeUnits = INITIAL_TOTAL_UNITS;
+  let partnerCumulativeUnits = 0.0;
+  let depositHistory = [];
+
+  /********* פונקציות עזר **********/
+
+  // עדכון תצוגת הסיכום העליון בדף
+  function updateSummary() {
+    const pricePerUnit = accountValue / totalUnits;
+    document.getElementById('accountValue').textContent = accountValue.toFixed(2);
+    document.getElementById('totalUnits').textContent = totalUnits.toFixed(2);
+    document.getElementById('pricePerUnit').textContent = pricePerUnit.toFixed(4);
+    const yourSharePercent = (yourCumulativeUnits / totalUnits) * 100;
+    const partnerSharePercent = (partnerCumulativeUnits / totalUnits) * 100;
+    document.getElementById('yourShare').textContent = yourSharePercent.toFixed(2) + '%';
+    document.getElementById('partnerShare').textContent = partnerSharePercent.toFixed(2) + '%';
+  }
+
+  // הוספת שורה לטבלת ההיסטוריה
+  function addHistoryRow(deposit, index) {
+    const tbody = document.querySelector('#historyTable tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${deposit.depositDate}</td>
+      <td>${deposit.yourDeposit.toFixed(2)}</td>
+      <td>${deposit.partnerDeposit.toFixed(2)}</td>
+      <td>${deposit.yourNewUnits.toFixed(2)}</td>
+      <td>${deposit.partnerNewUnits.toFixed(2)}</td>
+      <td>${deposit.pricePerUnit.toFixed(4)}</td>
+      <td>${deposit.newAccountValue.toFixed(2)}</td>
+      <td>${deposit.newTotalUnits.toFixed(2)}</td>
+      <td>${(deposit.yourShare * 100).toFixed(2)}%</td>
+      <td>${(deposit.partnerShare * 100).toFixed(2)}%</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  // רענון טבלת ההיסטוריה
+  function refreshHistoryTable() {
+    const tbody = document.querySelector('#historyTable tbody');
+    tbody.innerHTML = '';
+    depositHistory.forEach((deposit, index) => {
+      addHistoryRow(deposit, index);
+    });
+  }
+
+  // עדכון עורך ההיסטוריה (בפורמט JSON)
+  function updateHistoryEditor() {
+    document.getElementById('historyEditor').value = JSON.stringify(depositHistory, null, 2);
+  }
+
+  // טעינת ההיסטוריה מ-localStorage (אם קיימת)
+  function loadHistory() {
+    const stored = localStorage.getItem('depositHistory');
+    if (stored) {
+      try {
+        depositHistory = JSON.parse(stored);
+        if (depositHistory.length > 0) {
+          const last = depositHistory[depositHistory.length - 1];
+          accountValue = last.newAccountValue;
+          totalUnits = last.newTotalUnits;
+        } else {
+          accountValue = INITIAL_ACCOUNT_VALUE;
+          totalUnits = INITIAL_TOTAL_UNITS;
+        }
+        yourCumulativeUnits = INITIAL_TOTAL_UNITS;
+        partnerCumulativeUnits = 0.0;
+        depositHistory.forEach(deposit => {
+          yourCumulativeUnits += deposit.yourNewUnits;
+          partnerCumulativeUnits += deposit.partnerNewUnits;
+        });
+      } catch (e) {
+        console.error("שגיאה בפיענוח ההיסטוריה:", e);
+        depositHistory = [];
+      }
+    }
+    updateHistoryEditor();
+    refreshHistoryTable();
+  }
+
+  // שמירת ההיסטוריה ב-localStorage
+  function saveHistory() {
+    localStorage.setItem('depositHistory', JSON.stringify(depositHistory));
+  }
+
+  /********* טיפול בטופס ההפקדות **********/
+  document.getElementById('depositForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const yourDeposit = parseFloat(document.getElementById('yourDeposit').value);
+    const partnerDeposit = parseFloat(document.getElementById('partnerDeposit').value);
+    if (isNaN(yourDeposit) || isNaN(partnerDeposit)) {
+      alert("נא להזין סכומי הפקדה חוקיים.");
+      return;
+    }
+    const now = new Date();
+    const depositDate = now.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const pricePerUnit = accountValue / totalUnits;
+    const yourNewUnits = yourDeposit / pricePerUnit;
+    const partnerNewUnits = partnerDeposit / pricePerUnit;
+    const totalNewUnits = yourNewUnits + partnerNewUnits;
+    accountValue += (yourDeposit + partnerDeposit);
+    totalUnits += totalNewUnits;
+    yourCumulativeUnits += yourNewUnits;
+    partnerCumulativeUnits += partnerNewUnits;
+    const yourShare = yourCumulativeUnits / totalUnits;
+    const partnerShare = partnerCumulativeUnits / totalUnits;
+    const depositRecord = {
+      depositDate,
+      yourDeposit,
+      partnerDeposit,
+      yourNewUnits,
+      partnerNewUnits,
+      pricePerUnit,
+      newAccountValue: accountValue,
+      newTotalUnits: totalUnits,
+      yourShare,
+      partnerShare
+    };
+    depositHistory.push(depositRecord);
+    saveHistory();
+    updateSummary();
+    updateHistoryEditor();
+    refreshHistoryTable();
+    document.getElementById('yourDeposit').value = '';
+    document.getElementById('partnerDeposit').value = '';
+  });
+
+  /********* טיפול בעדכון שווי שוק **********/
+  document.getElementById('updateMarketBtn').addEventListener('click', function() {
+    const newMarketValue = parseFloat(document.getElementById('marketValue').value);
+    if (isNaN(newMarketValue)) {
+      alert("נא להזין ערך חוקי לשווי השוק.");
+      return;
+    }
+    accountValue = newMarketValue;
+    updateSummary();
+    alert("שווי החשבון עודכן בהצלחה.");
+    document.getElementById('marketValue').value = '';
+  });
+
+  /********* טיפול בניהול היסטוריה ידני **********/
+  document.getElementById('updateHistoryBtn').addEventListener('click', function() {
+    const editorValue = document.getElementById('historyEditor').value;
+    try {
+      const parsed = JSON.parse(editorValue);
+      if (!Array.isArray(parsed)) {
+        alert("ההיסטוריה צריכה להיות מערך (Array) של רשומות.");
+        return;
+      }
+      depositHistory = parsed;
+      saveHistory();
+      if (depositHistory.length > 0) {
+        const last = depositHistory[depositHistory.length - 1];
+        accountValue = last.newAccountValue;
+        totalUnits = last.newTotalUnits;
+      } else {
+        accountValue = INITIAL_ACCOUNT_VALUE;
+        totalUnits = INITIAL_TOTAL_UNITS;
+      }
+      yourCumulativeUnits = INITIAL_TOTAL_UNITS;
+      partnerCumulativeUnits = 0.0;
+      depositHistory.forEach(deposit => {
+        yourCumulativeUnits += deposit.yourNewUnits;
+        partnerCumulativeUnits += deposit.partnerNewUnits;
+      });
+      updateSummary();
+      updateHistoryEditor();
+      refreshHistoryTable();
+      alert("ההיסטוריה עודכנה בהצלחה.");
+    } catch (e) {
+      alert("אירעה שגיאה בפיענוח ה-JSON: " + e);
+    }
+  });
+
+  document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+    if (confirm("האם אתה בטוח שברצונך לנקות את ההיסטוריה? פעולה זו תמחק את כל הנתונים הקודמים.")) {
+      depositHistory = [];
+      saveHistory();
+      accountValue = INITIAL_ACCOUNT_VALUE;
+      totalUnits = INITIAL_TOTAL_UNITS;
+      yourCumulativeUnits = INITIAL_TOTAL_UNITS;
+      partnerCumulativeUnits = 0.0;
+      updateSummary();
+      updateHistoryEditor();
+      refreshHistoryTable();
+      alert("ההיסטוריה נוקתה בהצלחה.");
+    }
+  });
+
+  // אתחול הדף: עדכון הסיכום וטעינת היסטוריה קיימת
+  updateSummary();
+  loadHistory();
+</script>
+</body>
+</html>
