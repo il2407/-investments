@@ -110,6 +110,8 @@
     <p><strong>מחיר ליחידה (P):</strong> <span id="pricePerUnit">1.0000</span> ש״ח</p>
     <p><strong>האחוז שלך:</strong> <span id="yourShare">100.00%</span></p>
     <p><strong>האחוז של איה:</strong> <span id="partnerShare">0.00%</span></p>
+    <p><strong>ערך ההשקעה שלך:</strong> <span id="yourValue">120177.00</span> ש״ח</p>
+    <p><strong>ערך ההשקעה של איה:</strong> <span id="partnerValue">0.00</span> ש״ח</p>
   </div>
 
   <!-- עדכון שווי שוק (במקרה של תנודות בשוק) -->
@@ -207,6 +209,9 @@
     const partnerSharePercent = (partnerCumulativeUnits / totalUnits) * 100;
     document.getElementById('yourShare').textContent = yourSharePercent.toFixed(2) + '%';
     document.getElementById('partnerShare').textContent = partnerSharePercent.toFixed(2) + '%';
+    document.getElementById('yourValue').textContent = (accountValue * (yourCumulativeUnits / totalUnits)).toFixed(2);
+document.getElementById('partnerValue').textContent = (accountValue * (partnerCumulativeUnits / totalUnits)).toFixed(2);
+
   }
 
   // הוספת שורה לטבלת ההיסטוריה
